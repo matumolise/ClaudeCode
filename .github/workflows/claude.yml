@@ -1,0 +1,30 @@
+
+name: Claude - Delegacion de prueba
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  claude:
+    if: >-
+      github.event.issue.pull_request == null &&
+      github.event.comment.user.login == 'matumolise' &&
+      contains(github.event.comment.body, '@claude')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Ejecutar Claude
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          trigger_phrase: "@claude"
+          claude_args: "--max-turns 3 --allowedTools Read,Glob,Grep"
